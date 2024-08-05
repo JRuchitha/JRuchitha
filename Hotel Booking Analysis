@@ -1,0 +1,60 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+df = pd.read_csv('hotel_bookings.csv')
+
+# Display basic information about the dataset
+print(df.info())
+print(df.describe())
+
+# Booking Trends: Number of bookings per month
+monthly_bookings = df.groupby(['arrival_date_year', 'arrival_date_month']).size().unstack()
+monthly_bookings.plot(kind='bar', stacked=True, figsize=(14,7))
+plt.title('Number of Bookings per Month')
+plt.ylabel('Number of Bookings')
+plt.xlabel('Year')
+plt.xticks(rotation=45)
+plt.legend(title='Month')
+plt.show()
+
+# Cancellation Analysis: Percentage of cancellations
+cancellation_rate = df['is_canceled'].mean()
+print(f"Cancellation Rate: {cancellation_rate:.2%}")
+
+# Revenue Analysis: Average daily rate per month
+average_daily_rate = df.groupby(['arrival_date_year', 'arrival_date_month'])['adr'].mean().unstack()
+average_daily_rate.plot(kind='line', figsize=(14,7))
+plt.title('Average Daily Rate per Month')
+plt.ylabel('Average Daily Rate (ADR)')
+plt.xlabel('Year')
+plt.xticks(rotation=45)
+plt.legend(title='Month')
+plt.show()
+
+# Occupancy Rates: Percentage of occupied rooms per month
+df['total_guests'] = df['adults'] + df['children'] + df['babies']
+occupied_rooms = df[df['is_canceled'] == 0].groupby(['arrival_date_year', 'arrival_date_month'])['total_guests'].sum().unstack()
+occupied_rooms.plot(kind='bar', stacked=True, figsize=(14,7))
+plt.title('Number of Occupied Rooms per Month')
+plt.ylabel('Number of Occupied Rooms')
+plt.xlabel('Year')
+plt.xticks(rotation=45)
+plt.legend(title='Month')
+plt.show()
+
+# Booking Source Analysis: Distribution of bookings by market segment
+market_segment_distribution = df['market_segment'].value_counts(normalize=True) * 100
+market_segment_distribution.plot(kind='pie', autopct='%1.1f%%', figsize=(8,8))
+plt.title('Booking Source Distribution')
+plt.ylabel('')
+plt.show()
+
+# Customer Segmentation: Grouping by customer type
+customer_type_distribution = df['customer_type'].value_counts(normalize=True) * 100
+customer_type_distribution.plot(kind='bar', figsize=(8,6))
+plt.title('Customer Type Distribution')
+plt.ylabel('Percentage')
+plt.xlabel('Customer Type')
+plt.show()
